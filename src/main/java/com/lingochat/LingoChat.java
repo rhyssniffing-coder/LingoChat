@@ -8,8 +8,6 @@ import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 
 public class LingoChat implements ClientModInitializer {
@@ -24,11 +22,7 @@ public class LingoChat implements ClientModInitializer {
 	public void onInitializeClient() {
 		Config.load();
 
-		settingsKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-			"key.lingochat.settings",
-			GLFW.GLFW_KEY_U,
-			KeyBinding.Category.create(Identifier.of(MOD_ID, "main"))
-		));
+		settingsKey = KeyBindingHelper.registerKeyBinding(Platform.createSettingsKey());
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			while (settingsKey.wasPressed()) {

@@ -4,10 +4,6 @@ import com.lingochat.mixin.ChatHudAccess;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -18,7 +14,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public final class MessageStore {
 	public static final Identifier TRANSLATE_EVENT = Identifier.of(LingoChat.MOD_ID, "translate");
@@ -76,48 +71,27 @@ public final class MessageStore {
 		BY_CONTENT.clear();
 	}
 
-	/**
-	 * Handles clicks on our custom click events. Returns true if the event was ours.
-	 */
-	public static boolean handleClick(ClickEvent.Custom custom) {
-		if (!custom.id().equals(TRANSLATE_EVENT) && !custom.id().equals(TOGGLE_EVENT)) {
-			return false;
-		}
-
-		long id = payloadId(custom);
-		Entry entry = id >= 0 ? ENTRIES.get(id) : null;
+	// called by the version-specific click mixins once they've recognized our marker
+	public static void handleTranslate(long id) {
+		Entry entry = ENTRIES.get(id);
 		if (entry != null) {
-			if (custom.id().equals(TRANSLATE_EVENT)) {
-				startTranslate(entry, true);
-			} else {
-				toggle(entry);
-			}
+			startTranslate(entry, true);
 		}
-
-		// even if the entry is gone, it was still our event - don't send a packet about it
-		return true;
 	}
 
-	private static long payloadId(ClickEvent.Custom custom) {
-		Optional<NbtElement> payload = custom.payload();
-		if (payload.isPresent() && payload.get() instanceof NbtString string) {
-			Optional<String> value = string.asString();
-			if (value.isPresent()) {
-				try {
-					return Long.parseLong(value.get());
-				} catch (NumberFormatException ignored) {
-				}
-			}
+	public static void handleToggle(long id) {
+		Entry entry = ENTRIES.get(id);
+		if (entry != null) {
+			toggle(entry);
 		}
-		return -1L;
 	}
 
 	private static Text buildUntranslated(Entry entry) {
 		Style link = Style.EMPTY
 			.withColor(Formatting.GRAY)
 			.withItalic(true)
-			.withClickEvent(new ClickEvent.Custom(TRANSLATE_EVENT, Optional.of((NbtElement) NbtString.of(Long.toString(entry.id)))))
-			.withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to translate into " + entry.targetLanguageName)));
+			.withClickEvent(Platform.translateEvent(entry.id))
+			.withHoverEvent(Platform.hover("Click to translate into " + entry.targetLanguageName));
 		return entry.original.copy().append(Text.literal("\ntranslate").setStyle(link));
 	}
 
@@ -125,8 +99,8 @@ public final class MessageStore {
 		Style link = Style.EMPTY
 			.withColor(Formatting.GRAY)
 			.withItalic(true)
-			.withClickEvent(new ClickEvent.Custom(TOGGLE_EVENT, Optional.of((NbtElement) NbtString.of(Long.toString(entry.id)))))
-			.withHoverEvent(new HoverEvent.ShowText(Text.literal("Show the original message")));
+			.withClickEvent(Platform.toggleEvent(entry.id))
+			.withHoverEvent(Platform.hover("Show the original message"));
 		return Text.literal(entry.translatedText).append(Text.literal("\noriginal").setStyle(link));
 	}
 

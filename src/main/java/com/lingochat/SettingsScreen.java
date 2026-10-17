@@ -1,6 +1,5 @@
 package com.lingochat;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
@@ -22,7 +21,7 @@ public class SettingsScreen extends Screen {
 		int y = this.height / 2 - 50;
 
 		this.incomingLanguageButton = ButtonWidget.builder(incomingLabel(), button -> {
-			Config.get().incomingLanguage = Langs.next(Config.get().incomingLanguage, MinecraftClient.getInstance().isShiftPressed());
+			Config.get().incomingLanguage = Langs.next(Config.get().incomingLanguage, Platform.isShiftDown());
 			Config.save();
 			button.setMessage(incomingLabel());
 		}).dimensions(x, y, 240, 20).build();
@@ -44,7 +43,7 @@ public class SettingsScreen extends Screen {
 		this.addDrawableChild(this.autoOutgoingButton);
 
 		this.outgoingLanguageButton = ButtonWidget.builder(outgoingLabel(), button -> {
-			Config.get().outgoingLanguage = Langs.next(Config.get().outgoingLanguage, MinecraftClient.getInstance().isShiftPressed());
+			Config.get().outgoingLanguage = Langs.next(Config.get().outgoingLanguage, Platform.isShiftDown());
 			Config.save();
 			button.setMessage(outgoingLabel());
 		}).dimensions(x, y + 72, 240, 20).build();
