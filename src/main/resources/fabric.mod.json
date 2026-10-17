@@ -9,6 +9,11 @@
 	],
 	"license": "MIT",
 	"icon": "assets/lingochat/icon.png",
+	"contact": {
+		"homepage": "https://github.com/rhyssniffing-coder/LingoChat",
+		"sources": "https://github.com/rhyssniffing-coder/LingoChat",
+		"issues": "https://github.com/rhyssniffing-coder/LingoChat/issues"
+	},
 	"environment": "client",
 	"entrypoints": {
 		"client": [
