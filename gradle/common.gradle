@@ -1,0 +1,60 @@
+// applied by every version subproject in versions/<mc>/
+// reads minecraft_version, yarn_mappings, fabric_api_version, family from that subproject's gradle.properties
+
+repositories {
+	// loom adds the essential maven repositories automatically
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+}
+
+def fullVersion = "${project.mod_version}+${project.minecraft_version}"
+version = fullVersion
+
+base {
+	archivesName = 'LingoChat'
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = [
+				rootProject.file('src/main/java'),
+				rootProject.file("src/${project.family}/java"),
+			]
+		}
+		resources {
+			srcDirs = [
+				rootProject.file('src/main/resources'),
+			]
+		}
+	}
+}
+
+processResources {
+	inputs.property 'version', fullVersion
+	inputs.property 'minecraft_version', project.minecraft_version
+
+	filesMatching('fabric.mod.json') {
+		expand 'version': fullVersion, 'minecraft_version': project.minecraft_version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 21
+}
+
+java {
+	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+jar {
+	from('LICENSE')
+}

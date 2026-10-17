@@ -9,5 +9,25 @@ pluginManagement {
 	}
 }
 
-// Should match your modid
 rootProject.name = 'LingoChat'
+
+// one subproject per supported Minecraft version, each producing its own jar
+def mcVersions = [
+	'1.21': 'legacy',
+	'1.21.1': 'legacy',
+	'1.21.2': 'legacy',
+	'1.21.3': 'legacy',
+	'1.21.4': 'legacy',
+	'1.21.5': 'mid',
+	'1.21.6': 'mid',
+	'1.21.7': 'mid',
+	'1.21.8': 'mid',
+	'1.21.9': 'modern',
+	'1.21.10': 'modern',
+	'1.21.11': 'modern',
+]
+
+mcVersions.each { mcVer, family ->
+	include(mcVer)
+	project(":$mcVer").projectDir = file("versions/$mcVer")
+}
