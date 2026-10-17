@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "com.lingochat.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [],
+	"client": [
+		"ChatHudMixin",
+		"ChatHudAccess",
+		"ScreenMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

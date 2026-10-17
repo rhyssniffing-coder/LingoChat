@@ -1,0 +1,27 @@
+{
+	"schemaVersion": 1,
+	"id": "lingochat",
+	"version": "${version}",
+	"name": "LingoChat",
+	"description": "Click any chat message to translate it, and optionally auto-translate the messages you send.",
+	"authors": [
+		"Skiye"
+	],
+	"license": "MIT",
+	"icon": "assets/lingochat/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"com.lingochat.LingoChat"
+		]
+	},
+	"mixins": [
+		"lingochat.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.0",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
