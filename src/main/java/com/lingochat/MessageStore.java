@@ -35,6 +35,7 @@ public final class MessageStore {
 	private static final class Entry {
 		final long id;
 		final Text original;
+		final String targetLanguageName;
 		Text untranslatedContent;
 		String translatedText;
 		Text translatedContent;
@@ -45,6 +46,7 @@ public final class MessageStore {
 		Entry(long id, Text original) {
 			this.id = id;
 			this.original = original;
+			this.targetLanguageName = Langs.nameOf(Config.get().incomingLanguage);
 		}
 	}
 
@@ -115,7 +117,7 @@ public final class MessageStore {
 			.withColor(Formatting.GRAY)
 			.withItalic(true)
 			.withClickEvent(new ClickEvent.Custom(TRANSLATE_EVENT, Optional.of((NbtElement) NbtString.of(Long.toString(entry.id)))))
-			.withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to translate this message")));
+			.withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to translate into " + entry.targetLanguageName)));
 		return entry.original.copy().append(Text.literal("\ntranslate").setStyle(link));
 	}
 

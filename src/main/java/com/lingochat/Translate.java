@@ -11,6 +11,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,14 +32,31 @@ public final class Translate {
 		return thread;
 	});
 
+	// people say the same short stuff over and over, no point hitting the API every time
+	private static final int MAX_CACHED = 256;
+	private static final Map<String, Result> CACHE = Collections.synchronizedMap(new LinkedHashMap<String, Result>(64, 0.75f, true) {
+		@Override
+		protected boolean removeEldestEntry(Map.Entry<String, Result> eldest) {
+			return this.size() > MAX_CACHED;
+		}
+	});
+
 	private Translate() {
 	}
 
 	public static CompletableFuture<Result> request(String text, String targetLanguage) {
+		String key = targetLanguage + ' ' + text;
+		Result cached = CACHE.get(key);
+		if (cached != null) {
+			return CompletableFuture.completedFuture(cached);
+		}
+
 		CompletableFuture<Result> future = new CompletableFuture<>();
 		POOL.execute(() -> {
 			try {
-				future.complete(fetch(text, targetLanguage));
+				Result result = fetch(text, targetLanguage);
+				CACHE.put(key, result);
+				future.complete(result);
 			} catch (Exception e) {
 				future.completeExceptionally(e);
 			}
